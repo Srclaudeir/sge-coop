@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -17,8 +17,12 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getMachines, createMachine, updateMachine } from "../services/api";
 
-const Machines = ({ user, machines, setMachines, addNotification, agencies }) => {
+const Machines = ({ user, addNotification, agencies }) => {
+  const [machines, setMachines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterModel, setFilterModel] = useState("");
   const [filterAgency, setFilterAgency] = useState("");
@@ -29,6 +33,21 @@ const Machines = ({ user, machines, setMachines, addNotification, agencies }) =>
   const [showMaintenanceHistory, setShowMaintenanceHistory] = useState(false);
   const [maintenanceHistory, setMaintenanceHistory] = useState([]);
   const [expandedFilters, setExpandedFilters] = useState(false);
+
+  useEffect(() => {
+    const fetchMachines = async () => {
+      try {
+        const data = await getMachines();
+        setMachines(data);
+      } catch (error) {
+        setError(error.message);
+        addNotification("error", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMachines();
+  }, [addNotification]);
 
   // Dados para gráficos de máquina
   const warrantyStatusData = [
@@ -102,7 +121,7 @@ const Machines = ({ user, machines, setMachines, addNotification, agencies }) =>
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!currentMachine.model || !currentMachine.serialNumber) {
@@ -110,21 +129,27 @@ const Machines = ({ user, machines, setMachines, addNotification, agencies }) =>
       return;
     }
 
-    if (machineToEdit) {
-      // Atualizar máquina existente
-      setMachines(
-        machines.map((m) =>
-          m.id === machineToEdit.id ? { ...currentMachine } : m
-        )
-      );
-      addNotification("success", "Máquina atualizada com sucesso!");
-    } else {
-      // Adicionar nova máquina
-      setMachines([...machines, { ...currentMachine }]);
-      addNotification("success", "Máquina cadastrada com sucesso!");
+    try {
+      if (machineToEdit) {
+        const updatedMachine = await updateMachine(
+          machineToEdit.id,
+          currentMachine
+        );
+        setMachines(
+          machines.map((m) =>
+            m.id === machineToEdit.id ? updatedMachine : m
+          )
+        );
+        addNotification("success", "Máquina atualizada com sucesso!");
+      } else {
+        const newMachine = await createMachine(currentMachine);
+        setMachines([...machines, newMachine]);
+        addNotification("success", "Máquina cadastrada com sucesso!");
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      addNotification("error", error.message);
     }
-
-    setIsModalOpen(false);
   };
 
   const updateCurrentMachine = (field, value) => {
@@ -212,6 +237,14 @@ const Machines = ({ user, machines, setMachines, addNotification, agencies }) =>
         return status;
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>

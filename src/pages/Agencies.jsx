@@ -1,10 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Settings, CreditCard, Building } from "lucide-react";
+import { getAgencies, createAgency, updateAgency } from "../services/api";
 
-const Agencies = ({ user, agencies, setAgencies, addNotification }) => {
+const Agencies = ({ user, addNotification }) => {
+  const [agencies, setAgencies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentAgency, setCurrentAgency] = useState(null);
   const [agencyToEdit, setAgencyToEdit] = useState(null);
+
+  useEffect(() => {
+    const fetchAgencies = async () => {
+      try {
+        const data = await getAgencies();
+        setAgencies(data);
+      } catch (error) {
+        setError(error.message);
+        addNotification("error", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAgencies();
+  }, [addNotification]);
 
   const handleEditAgency = (agency) => {
     setAgencyToEdit(agency);
@@ -36,7 +55,7 @@ const Agencies = ({ user, agencies, setAgencies, addNotification }) => {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!currentAgency?.name || !currentAgency?.code) {
@@ -44,21 +63,27 @@ const Agencies = ({ user, agencies, setAgencies, addNotification }) => {
       return;
     }
 
-    if (agencyToEdit) {
-      // Update existing agency
-      setAgencies(
-        agencies.map((a) =>
-          a.id === agencyToEdit.id ? { ...currentAgency } : a
-        )
-      );
-      addNotification("success", "Agência atualizada com sucesso!");
-    } else {
-      // Add new agency
-      setAgencies([...agencies, { ...currentAgency }]);
-      addNotification("success", "Agência cadastrada com sucesso!");
+    try {
+      if (agencyToEdit) {
+        const updatedAgency = await updateAgency(
+          agencyToEdit.id,
+          currentAgency
+        );
+        setAgencies(
+          agencies.map((a) =>
+            a.id === agencyToEdit.id ? updatedAgency : a
+          )
+        );
+        addNotification("success", "Agência atualizada com sucesso!");
+      } else {
+        const newAgency = await createAgency(currentAgency);
+        setAgencies([...agencies, newAgency]);
+        addNotification("success", "Agência cadastrada com sucesso!");
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      addNotification("error", error.message);
     }
-
-    setIsModalOpen(false);
   };
 
   const updateCurrentAgency = (field, value) => {
@@ -84,6 +109,14 @@ const Agencies = ({ user, agencies, setAgencies, addNotification }) => {
       return updated;
     });
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
