@@ -1,0 +1,158 @@
+export const initialMachines = [
+  {
+    id: "1",
+    model: "Ingenico APOS A8",
+    serialNumber: "SN123456789",
+    fixedAssetNumber: "FA1001",
+    connectionType: ["3G/4G", "Wi-Fi", "Ethernet"],
+    accessories: {
+      charger: true,
+      usbCable: true,
+      paperRolls: 3,
+      manual: true,
+      protectiveFilm: true,
+      simCard: {
+        carrier: "Vivo",
+        number: "SIM123456789",
+      },
+    },
+    status: "in_stock_matrix",
+    supplier: "Cielo",
+    acquisitionDate: "2023-03-15",
+    warrantyMonths: 24,
+  },
+  {
+    id: "2",
+    model: "Gertec GPOS700",
+    serialNumber: "SN987654321",
+    fixedAssetNumber: "FA1002",
+    connectionType: ["Wi-Fi"],
+    accessories: {
+      charger: true,
+      usbCable: false,
+      paperRolls: 1,
+      manual: true,
+      protectiveFilm: false,
+      simCard: {
+        carrier: "Claro",
+        number: "SIM987654321",
+      },
+    },
+    status: "in_stock_matrix",
+    supplier: "Stone",
+    acquisitionDate: "2023-04-01",
+    warrantyMonths: 18,
+  },
+];
+
+export const initialAgencies = [
+  {
+    id: "A1",
+    name: "Sicoob Agência Central",
+    code: "001",
+    address: {
+      cep: "01001-000",
+      street: "Praça dos Correios",
+      number: "001",
+      complement: "",
+      neighborhood: "Centro",
+      city: "São Paulo",
+      state: "SP",
+    },
+    contact: {
+      phone: "(11) 3003-9000",
+      email: "central@sicoob.com.br",
+    },
+    manager: "Gestor1",
+  },
+  {
+    id: "A2",
+    name: "Sicoob Agência Paulista",
+    code: "002",
+    address: {
+      cep: "01311-928",
+      street: "Avenida Paulista",
+      number: "1000",
+      complement: "10º andar",
+      neighborhood: "Bela Vista",
+      city: "São Paulo",
+      state: "SP",
+    },
+    contact: {
+      phone: "(11) 3003-9001",
+      email: "paulista@sicoob.com.br",
+    },
+    manager: "Gestor2",
+  },
+];
+
+export const initialClients = [
+  {
+    id: "C1",
+    type: "pf",
+    name: "João Silva",
+    document: "123.456.789-00",
+    contact: {
+      phone: "(11) 99999-9999",
+      email: "joaosilva@email.com",
+    },
+    installationAddress: {
+      cep: "01001-000",
+      street: "Praça dos Correios",
+      number: "001",
+      complement: "",
+      neighborhood: "Centro",
+      city: "São Paulo",
+      state: "SP",
+    },
+    agencyId: "A1",
+  },
+  {
+    id: "C2",
+    type: "pj",
+    name: "Empresa de Tecnologia LTDA",
+    document: "12.345.678/0001-90",
+    responsibleName: "Carlos Oliveira",
+    contact: {
+      phone: "(11) 98888-8888",
+      email: "empresa@email.com",
+    },
+    installationAddress: {
+      cep: "04546-002",
+      street: "Avenida das Nações Unidas",
+      number: "12345",
+      complement: "Edifício Empresarial",
+      neighborhood: "Vila Gertrudes",
+      city: "São Paulo",
+      state: "SP",
+    },
+    agencyId: "A2",
+  },
+];
+
+export const initialOperations = [
+  {
+    id: "OP1",
+    machineId: "1",
+    clientId: "C1",
+    agencyId: "A1",
+    type: "rental",
+    startDate: "2023-04-01",
+    endDate: null,
+    monthlyRent: 50.0,
+    contract: "contract1.pdf",
+    status: "active",
+  },
+  {
+    id: "OP2",
+    machineId: "2",
+    clientId: "C2",
+    agencyId: "A2",
+    type: "rental",
+    startDate: "2023-05-15",
+    endDate: null,
+    monthlyRent: 45.0,
+    contract: "contract2.pdf",
+    status: "active",
+  },
+];
